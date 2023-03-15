@@ -9,10 +9,15 @@ interface UsersCreationAttrs{
     first_name: string;
     last_name: string;
     username: string;
+    hashed_password: string;
     telegram_link: string;
     email: string;
     phone: string;
+    user_photo: string;
     birth_day: string;
+    is_owner: boolean;
+    Is_active: boolean;
+    hashed_refresh_token: string;
 
 };
 
@@ -42,10 +47,14 @@ export class Users extends Model<Users, UsersCreationAttrs> {
         allowNull: false,
     })
     username: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    hashed_password: string;
     
     @Column({
         type: DataType.STRING,
-        allowNull: false,
     })
     telegram_link: string;
 
@@ -54,40 +63,54 @@ export class Users extends Model<Users, UsersCreationAttrs> {
         allowNull: false,
     })
     email: string;
+    
+    @Column({
+        type: DataType.STRING,
+        allowNull: false,
+    })
+    phone: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    user_photo: string;
 
     @Column({
         type: DataType.STRING,
         allowNull: false,
     })
-    hashed_password: string;
+    birth_day: string;
 
     @Column({
         type: DataType.BOOLEAN,
-        allowNull: true,
+    })
+    is_owner: boolean;
+
+    @Column({
+        type: DataType.BOOLEAN,
     })
     is_active: boolean;
 
     @Column({
-        type: DataType.BOOLEAN,
-        allowNull: true,
+        type: DataType.STRING,
     })
-    is_creater: boolean;
+    hashed_refresh_token: string;
 
+    
     @Column({
-        type: DataType.INTEGER,
-        allowNull: true,
+        type: DataType.STRING,
     })
-    hashed_refresh_token: number;
+    activation_link: string;
 
-    @HasMany(() => User_wallet)
-    user_walet: User_wallet;
+    // @HasMany(() => User_wallet)
+    // user_walet: User_wallet;
 
-    @HasMany(() => Stadium)
-    stadium: Stadium;
+    // @HasMany(() => Stadium)
+    // stadium: Stadium;
 
-    @HasMany(() => UsersCard)
-    userscard: UsersCard;
+    // @HasMany(() => UsersCard)
+    // userscard: UsersCard;
 
-    @HasMany(() => Comments)
-    comments: Comments;
+    // @HasMany(() => Comments)
+    // comments: Comments;
 }

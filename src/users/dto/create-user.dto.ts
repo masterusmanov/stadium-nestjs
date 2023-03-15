@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsString, IsNotEmpty, IsEmail, IsStrongPassword, MinLength } from "class-validator";
+import { IsString, IsNotEmpty, IsEmail, IsStrongPassword, MinLength, IsPhoneNumber, IsDateString } from "class-validator";
 
 export class CreateUserDto {
     @ApiProperty({ example: 'first_name', description: 'Foydalanuvchi ismi'})
@@ -16,26 +16,31 @@ export class CreateUserDto {
     @IsNotEmpty()
     @IsString()
     readonly username: string;
-    
-    @ApiProperty({ example: 'telegram_link', description: 'telegram linki'})
+
+    @ApiProperty({ example: 'P@$$w00rd', description: 'Foydalanuvchi paroli'})
     @IsNotEmpty()
     @IsString()
-    readonly telegram_link: string;
+    @MinLength(6)
+    @IsStrongPassword()
+    readonly password: string;
+
+    @ApiProperty({ example: 'P@$$w00rd', description: 'Foydalanuvchi takroriy paroli'})
+    @IsNotEmpty()
+    @IsString()
+    @MinLength(6)
+    readonly confirm_password: string;
 
     @ApiProperty({ example: 'User@email.uz', description: 'Foydalanuvchi emaili'})
     @IsEmail()
     readonly email: string;
 
-    @ApiProperty({ example: '+998912345678', description: 'Foydalanuvchi telefon raqami'})
+    @ApiProperty({ example: '912345678', description: 'Foydalanuvchi telefon raqami'})
     @IsNotEmpty()
-    @IsString()
+    @IsPhoneNumber()
     readonly phone: string;
 
-    @ApiProperty({ example: '2023-13-03', description: "Foydalanuvchi tug'ilgan sanasi"})
+    @ApiProperty({ example: '2023.13.03', description: "Foydalanuvchi tug'ilgan sanasi"})
     @IsNotEmpty()
-    @IsString()
+    @IsDateString()
     readonly birth_day: string;
-
-
-
 }

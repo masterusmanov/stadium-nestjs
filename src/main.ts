@@ -9,6 +9,7 @@ async function bootstrap() {
 
   const PORT = process.env.PORT || 1987;
   app.useGlobalPipes(new ValidationPipe());
+  app.setGlobalPrefix('api');
 
   const config = new DocumentBuilder()
     .setTitle('NestJS TEST')
