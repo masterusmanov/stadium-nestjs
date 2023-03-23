@@ -1,3 +1,3 @@
 export class UpdateCommentDto {
-    readonly impression: string;
+    readonly impression?: string;
 }

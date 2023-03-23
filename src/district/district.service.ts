@@ -1,26 +1,34 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateDistrictDto } from './dto/create-district.dto';
 import { UpdateDistrictDto } from './dto/update-district.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { District } from './models/district.model';
+import { where } from 'sequelize';
 
 @Injectable()
 export class DistrictService {
-  create(createDistrictDto: CreateDistrictDto) {
-    return 'This action adds a new district';
+  constructor(@InjectModel(District) private disctrictRepo: typeof District){}
+
+  async create(createDistrictDto: CreateDistrictDto) {
+    const newDistrict = await this.disctrictRepo.create(createDistrictDto)
+    return newDistrict;
   }
 
-  findAll() {
-    return `This action returns all district`;
+  async findAll() {
+    const allDistrict = await this.disctrictRepo.findAll({include: {all: true}})
+    return allDistrict;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} district`;
+  async findOne(id: number) {
+    const onedistrict = await this.disctrictRepo.findOne({where: {id}})
+    return onedistrict;
   }
 
-  update(id: number, updateDistrictDto: UpdateDistrictDto) {
-    return `This action updates a #${id} district`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} district`;
+  async remove(id: number) {
+    const removedistrict = await this.disctrictRepo.destroy({where: {id}})
+    if(!removedistrict){
+      throw new HttpException("Bunday tuman mavjud emas", HttpStatus.NOT_FOUND)
+    }
+    return {message: "Ro'yhatdagi tuman o'chirildi"};
   }
 }

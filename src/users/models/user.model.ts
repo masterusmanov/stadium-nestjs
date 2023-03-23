@@ -83,11 +83,14 @@ export class Users extends Model<Users, UsersCreationAttrs> {
 
     @Column({
         type: DataType.BOOLEAN,
+        defaultValue: false
     })
     is_owner: boolean;
 
     @Column({
         type: DataType.BOOLEAN,
+        defaultValue: false
+
     })
     is_active: boolean;
 

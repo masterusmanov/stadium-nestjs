@@ -1,26 +1,43 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateStadiumDto } from './dto/create-stadium.dto';
 import { UpdateStadiumDto } from './dto/update-stadium.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { Stadium } from './models/stadium.model';
+import { ComfortService } from '../comfort/comfort.service';
 
 @Injectable()
 export class StadiumsService {
-  create(createStadiumDto: CreateStadiumDto) {
-    return 'This action adds a new stadium';
+  constructor(@InjectModel(Stadium) private stadiumRepo: typeof Stadium,
+  private readonly comfortService: ComfortService) {} 
+
+  async create(createStadiumDto: CreateStadiumDto) {
+    const newstadium = await this.stadiumRepo.create(createStadiumDto)
+    return newstadium;
   }
 
-  findAll() {
-    return `This action returns all stadiums`;
+  async findAll() {
+    const allstadium = await this.stadiumRepo.findAll({include: {all: true}})
+    return allstadium;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} stadium`;
+  async findOne(id: number) {
+    const onestadium = await this.stadiumRepo.findOne({where: {id}})
+    return onestadium;
   }
 
-  update(id: number, updateStadiumDto: UpdateStadiumDto) {
-    return `This action updates a #${id} stadium`;
+  async update(id: number, updateStadiumDto: UpdateStadiumDto) {
+    const upstadium = await this.stadiumRepo.update(updateStadiumDto, {
+      where: {id},
+      returning: true
+    })
+    return upstadium;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} stadium`;
+  async remove(id: number) {
+    const removestadium = await this.stadiumRepo.destroy({where: {id}})
+    if(!removestadium){
+      throw new HttpException("Stadion mavjud emas", HttpStatus.NOT_FOUND)
+    }
+    return {message: "Stadion ro'yhatdan o'chirildi"};
   }
 }

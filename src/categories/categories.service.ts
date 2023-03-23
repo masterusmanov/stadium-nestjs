@@ -1,26 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { UpdateCategoryDto } from './dto/update-category.dto';
+import { Categories } from './model/category.model';
+import { InjectModel } from '@nestjs/sequelize';
+
 
 @Injectable()
 export class CategoriesService {
-  create(createCategoryDto: CreateCategoryDto) {
-    return 'This action adds a new category';
+  constructor(@InjectModel(Categories) private categoryRepo: typeof Categories) {}
+
+  async create(createCategoryDto: CreateCategoryDto) {
+    const newCategory = await this.categoryRepo.create(createCategoryDto)
+    return newCategory;
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async findAll() {
+    const categories = await this.categoryRepo.findAll({include:{all: true}})
+    return categories
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
-  }
+  async remove(id: number) {
+    const category = await this.categoryRepo.destroy({where: {id}});
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+    if(!category){
+      throw new HttpException('Foydalanuvchi yuq', HttpStatus.NOT_FOUND)
+    }
+    return {message: 'User uchirildi'}
   }
 }

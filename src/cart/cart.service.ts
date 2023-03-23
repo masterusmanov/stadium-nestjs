@@ -1,26 +1,28 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCartDto } from './dto/create-cart.dto';
-import { UpdateCartDto } from './dto/update-cart.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { Cart } from './model/cart.model';
 
 @Injectable()
 export class CartService {
-  create(createCartDto: CreateCartDto) {
-    return 'This action adds a new cart';
+  constructor(@InjectModel(Cart) private cartRepo: typeof Cart) {}
+
+  async create(createCartDto: CreateCartDto) {
+    const newCart = await this.cartRepo.create(createCartDto);
+    return newCart;
   }
 
-  findAll() {
-    return `This action returns all cart`;
+  async findAll() {
+    const cartAll =  this.cartRepo.findAll({include:{all: true}});
+    return cartAll;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} cart`;
-  }
+  async remove(id: number) {
+    const cartremove = await this.cartRepo.destroy({where: {id}});
 
-  update(id: number, updateCartDto: UpdateCartDto) {
-    return `This action updates a #${id} cart`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} cart`;
+    if(!cartremove){
+      throw new HttpException("Ma'lumot yo'q", HttpStatus.NOT_FOUND)
+    }
+    return {message: "Cart o'chirildi"};
   }
 }

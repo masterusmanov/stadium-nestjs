@@ -1,4 +1,3 @@
-
 export class UpdateStadiumDto {
     readonly contact_with?: string;
     readonly name?: string;

@@ -1,11 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Res, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Res, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Users } from './models/user.model';
 import { Response } from 'express';
 import { LoginUserDto } from './dto/login-user.dto';
+import { CookieGetter } from '../decorators/cookieGetter.decorator';
+import { PhoneUserDto } from './dto/phone-user.dto';
+import { VerifyOtpDto } from './dto/verifyOtp.dto';
+import { FindUserDto } from './dto/find-user.dto'
+import { JwtAuthGuard } from '../guards/jwtusers.guards';
 
 @ApiTags('Users')
 @Controller('users')
@@ -23,6 +27,7 @@ export class UsersController {
   };
 
   @ApiOperation({ summary: 'login User'})
+  @UseGuards(JwtAuthGuard)
   @ApiResponse({ status: 200, type: Users})
   @HttpCode(HttpStatus.OK)
   @Post('signin')
@@ -31,31 +36,52 @@ export class UsersController {
     @Res({ passthrough: true }) res: Response
   ){
     return this.usersService.login(loginUserDto, res);
-  }
+  };
+
+  @ApiOperation({summary: 'logout User'})
+  @UseGuards(JwtAuthGuard)
+  @ApiResponse({status: 2000, type: Users})
+  @HttpCode(HttpStatus.OK)
+  @Post("signout")
+  logout(
+    @CookieGetter('refresh_token') refreshToken: string,
+    @Res({passthrough:true}) res:Response
+  ){
+    console.log(refreshToken);
+    
+    return this.usersService.logout(refreshToken, res)
+  };
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({summary: 'activate user'})
+  @ApiResponse({status: 200, type: [Users]})
+  @Get('activate/:link')
+  activate(@Param('link') link: string){
+    return this.usersService.activate(link);
+  };
+
+  @UseGuards(JwtAuthGuard)
+  @Post(':id/refresh')
+  refresh(
+    @Param('id') id: string,
+    @CookieGetter('refresh_token') refreshToken: string,
+    @Res({passthrough: true}) res: Response
+  ){
+    return this.usersService.refreshToken(+id, refreshToken, res);
+  };
   
+  @Post('/otp')
+  newOTP(@Body() phoneUserDto: PhoneUserDto) {
+    return this.usersService.newOTP(phoneUserDto);
+  };
 
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.create(createUserDto);
-  // }
+  @Post('/verify')
+  verifyOtp(@Body() verfyOtpDto: VerifyOtpDto) {
+    return this.usersService.verifyOtp(verfyOtpDto);
+  };
 
-  // @Get()
-  // findAll() {
-  //   return this.usersService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.usersService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.usersService.remove(+id);
-  // }
+  @Post('find')
+  findAll(@Body() findUserDto: FindUserDto) {
+    return this.usersService.findAll(findUserDto);
+  };
 }

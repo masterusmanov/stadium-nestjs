@@ -1,26 +1,41 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { Comments } from './models/comment.model';
 
 @Injectable()
 export class CommentsService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
-  }
+  constructor(@InjectModel(Comments) private commentsRepo: typeof Comments){}
 
-  findAll() {
-    return `This action returns all comments`;
-  }
+  async create(createCommentDto: CreateCommentDto) {
+    const newcomment = await this.commentsRepo.create(createCommentDto)
+    return newcomment;
+  };
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
-  }
+  async findAll() {
+    const comments = await this.commentsRepo.findAll({include: {all: true}})
+    return comments;
+  };
 
-  update(id: number, updateCommentDto: UpdateCommentDto) {
-    return `This action updates a #${id} comment`;
-  }
+  async findOne(id: number) {
+    const commentone = await this.commentsRepo.findOne({where: {id}})
+    return commentone;
+  };
 
-  remove(id: number) {
-    return `This action removes a #${id} comment`;
-  }
+  async update(id: number, updateCommentDto: UpdateCommentDto) {
+    const updatecomment = await this.commentsRepo.update(updateCommentDto, {
+      where: {id},
+      returning: true
+    })
+    return updatecomment;
+  };
+
+  async remove(id: number) {
+    const removecomment = await this.commentsRepo.destroy({where: {id}})
+    if(!removecomment){
+      throw new HttpException('Comment mavjud emas', HttpStatus.NOT_FOUND)
+    };
+    return {message: "Comment o'chirildi"};
+  };
 }

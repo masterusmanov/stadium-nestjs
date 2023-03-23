@@ -3,6 +3,7 @@ import { User_wallet } from "../../user_wallet/models/user_wallet.model";
 import { Users } from "../../users/models/user.model";
 import { Status } from "../../status/model/status.model";
 import { StadiumTimes } from "../../stadium_times/model/stadium_time.model";
+import { UsersCard } from "../../user_cards/model/user_card.model";
 
 interface CartCreationAttrs{
     date: Date;
@@ -23,6 +24,13 @@ export class Cart extends Model<Cart, CartCreationAttrs> {
         type: DataType.INTEGER
     })
     userId: number;
+
+    @ForeignKey(() => UsersCard)
+    @Column({
+        type: DataType.INTEGER,
+        allowNull: false
+    })
+    user_wallet_id: number;
 
     @ForeignKey(() => User_wallet)
     @Column({
